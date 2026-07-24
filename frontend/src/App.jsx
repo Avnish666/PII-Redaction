@@ -73,7 +73,7 @@ function App() {
     <div className="container">
       <div className="card">
 
-        <h1>🛡️ PII Redaction Tool</h1>
+        <h1>🛡️ PiiDactor</h1>
 
         <p>
           Upload a DOCX document and automatically detect
