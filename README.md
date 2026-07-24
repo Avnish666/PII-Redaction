@@ -6,6 +6,13 @@ The application can redact sensitive text, detect sensitive information inside i
 
 ---
 
+
+## 📸 Application Preview
+
+![PII Redaction Tool](https://github.com/Avnish666/PII-Redaction/blob/3fdc9e4b364987c666e5ebfd52d211d69107b625/Screenshot%202026-07-24%20232145.png)
+
+---
+
 ## Features
 
 - 📄 Upload DOCX documents
