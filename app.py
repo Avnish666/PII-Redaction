@@ -8,15 +8,8 @@ from main import process_document
 app = Flask(__name__)
 CORS(
     app,
-    resources={
-        r"/*": {
-            "origins": [
-                "https://pii-redaction-phi.vercel.app"
-            ]
-        }
-    }
+    resources={r"/*": {"origins": "*"}}
 )
-
 UPLOAD_FOLDER = "uploads"
 OUTPUT_FOLDER = "output"
 
