@@ -6,7 +6,16 @@ from werkzeug.utils import secure_filename
 from main import process_document
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [
+                "https://pii-redaction-phi.vercel.app"
+            ]
+        }
+    }
+)
 
 UPLOAD_FOLDER = "uploads"
 OUTPUT_FOLDER = "output"
