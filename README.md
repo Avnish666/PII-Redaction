@@ -95,7 +95,7 @@ python app.py
 Backend runs on:
 
 ```
-http://127.0.0.1:5000
+https://pii-redaction-tr46.onrender.com/redact
 ```
 
 ---
@@ -111,7 +111,7 @@ npm run dev
 Runs on:
 
 ```
-http://localhost:5173
+https://pii-redaction-9vznkd7xu-avnish666s-projects.vercel.app/
 ```
 
 ---
