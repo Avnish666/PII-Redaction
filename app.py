@@ -23,6 +23,9 @@ def home():
         "message": "PII Redaction API is running"
     }
 
+@app.route("/test")
+def test():
+    return "TEST ROUTE WORKS"
 
 @app.route("/redact", methods=["POST"])
 def redact():
