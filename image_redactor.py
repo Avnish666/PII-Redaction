@@ -1,14 +1,19 @@
 import os
 import re
-
+import shutil
 import cv2
 import numpy as np
 import pytesseract
 from PIL import Image, ImageDraw
 
-pytesseract.pytesseract.tesseract_cmd = (
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-)
+windows_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+
+if os.path.exists(windows_path):
+    pytesseract.pytesseract.tesseract_cmd = windows_path
+elif shutil.which("tesseract"):
+    pytesseract.pytesseract.tesseract_cmd = shutil.which("tesseract")
+else:
+    raise RuntimeError("Tesseract OCR not found.")
 
 AADHAAR_NUMBER = r"\b\d{4}\s\d{4}\s\d{4}\b"
 

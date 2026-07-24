@@ -1,0 +1,10 @@
+Flask
+Flask-Cors
+gunicorn
+python-docx
+spacy
+pytesseract
+opencv-python-headless
+numpy
+Pillow
+Werkzeug
