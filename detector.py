@@ -90,7 +90,7 @@ def detect_entities(text):
         if value in INVALID_ENTITIES:
             continue
 
-        # ---------------- PERSON ----------------
+      
         if ent.label_ == "PERSON":
 
             words = value.split()
