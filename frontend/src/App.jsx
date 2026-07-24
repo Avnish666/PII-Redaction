@@ -26,7 +26,7 @@ function App() {
       setLoading(true);
 
       const response = await axios.post(
-        "http://127.0.0.1:5000/redact",
+        "https://pii-redaction-tr46.onrender.com/redact",
         formData,
         {
           responseType: "blob",
