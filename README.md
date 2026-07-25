@@ -7,6 +7,12 @@ The application can redact sensitive text, detect sensitive information inside i
 ---
 
 
+## Update
+
+The frontend is deployed on Vercel. The backend runs successfully in a local environment. The cloud deployment on Render's free tier exceeds the available memory because OCR (Tesseract), OpenCV, and document processing are memory-intensive. The submitted output document was generated using the same codebase running locally.
+
+---
+
 ## 📸 Application Preview
 
 ![PII Redaction Tool](https://github.com/Avnish666/PII-Redaction/blob/3fdc9e4b364987c666e5ebfd52d211d69107b625/Screenshot%202026-07-24%20232145.png)
