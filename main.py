@@ -1,6 +1,6 @@
 from docx import Document
 import sys
-
+import gc
 from image_redactor import redact_images
 from replace_images import replace_images
 from extract_images import extract_images
@@ -53,8 +53,12 @@ def process_document(input_path, output_path):
     print("Extracting images...")
     extract_images(input_path)
 
+    gc.collect()
+
     print("Redacting sensitive images...")
     redact_images()
+
+    gc.collect()
 
     temp_doc = "output/redacted_with_images.docx"
 
@@ -62,11 +66,19 @@ def process_document(input_path, output_path):
     replace_images(
     input_path,
     temp_doc
-)
+    )
+
+    gc.collect()
+ 
+    import shutil
+    if os.path.exists("images"):
+        shutil.rmtree("images")
+
+    gc.collect()
 
     doc = Document(temp_doc)
     text = extract_text(doc)
-
+    gc.collect()
     print("=" * 60)
     print("DOCUMENT LOADED SUCCESSFULLY")
     print("=" * 60)
@@ -76,7 +88,7 @@ def process_document(input_path, output_path):
     pii = detect_pii(text)
     entities = detect_entities(text)
     entities["PERSON"] = clean_persons(entities["PERSON"])
-
+    gc.collect()
     print("\n\nTEXT PII")
     print("=" * 60)
 
@@ -160,7 +172,7 @@ def process_document(input_path, output_path):
         print(f"{old} ---> {new}")
 
     doc = apply_replacements(doc, replacement_map)
-
+    gc.collect()
     doc.save(output_path)
 
     print("\n")

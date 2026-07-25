@@ -1,5 +1,6 @@
 import os
 import re
+import gc
 import shutil
 import cv2
 import numpy as np
@@ -23,8 +24,8 @@ PAN_KEYWORDS = [
     "permanent account number",
 ]
 
+MAX_WIDTH = 900
 
-import gc
 
 def redact_images():
     folder = "images"
@@ -41,75 +42,112 @@ def redact_images():
         if not file.lower().endswith((".png", ".jpg", ".jpeg")):
             continue
 
-        img = Image.open(path).convert("RGB")
+        print(f"\n========== {file} ==========")
 
-        # Resize huge images before OCR
-        MAX_WIDTH = 1200
+        try:
 
-        if img.width > MAX_WIDTH:
-            ratio = MAX_WIDTH / img.width
-            img = img.resize(
-                (MAX_WIDTH, int(img.height * ratio)),
-                Image.Resampling.LANCZOS,
+            img = Image.open(path)
+
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+
+            # Resize large images
+            if img.width > MAX_WIDTH:
+                ratio = MAX_WIDTH / img.width
+                img = img.resize(
+                    (
+                        MAX_WIDTH,
+                        int(img.height * ratio),
+                    ),
+                    Image.Resampling.BILINEAR,
+                )
+
+            draw = ImageDraw.Draw(img)
+
+            qr_detected = False
+
+            # ---------- QR Detection ----------
+            img_np = np.asarray(img)
+
+            cv_img = cv2.cvtColor(
+                img_np,
+                cv2.COLOR_RGB2BGR,
             )
 
-        draw = ImageDraw.Draw(img)
+            del img_np
 
-        qr_detected = False
+            success, decoded_info, points, _ = detector.detectAndDecodeMulti(
+                cv_img
+            )
 
-        cv_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+            del cv_img
 
-        success, decoded_info, points, _ = detector.detectAndDecodeMulti(cv_img)
+            if success and points is not None:
 
-        if success and points is not None:
+                print(">> QR Code Detected")
 
-            print(">> QR Code Detected")
+                qr_detected = True
 
-            qr_detected = True
+                for qr in points:
 
-            for qr in points:
+                    x_min = int(np.min(qr[:, 0]))
+                    y_min = int(np.min(qr[:, 1]))
+                    x_max = int(np.max(qr[:, 0]))
+                    y_max = int(np.max(qr[:, 1]))
 
-                x_min = int(np.min(qr[:, 0]))
-                y_min = int(np.min(qr[:, 1]))
-                x_max = int(np.max(qr[:, 0]))
-                y_max = int(np.max(qr[:, 1]))
+                    draw.rectangle(
+                        [(x_min, y_min), (x_max, y_max)],
+                        fill="black",
+                    )
 
+            # ---------- OCR ----------
+            text = ""
+
+            if not qr_detected:
+
+                try:
+                    text = pytesseract.image_to_string(
+                        img,
+                        config="--oem 3 --psm 6",
+                    ).lower()
+
+                except Exception as e:
+                    print("OCR Error:", e)
+
+            print(text)
+
+            is_sensitive = False
+
+            if (
+                re.search(AADHAAR_NUMBER, text)
+                and ("male" in text or "female" in text)
+            ):
+                print(">> Aadhaar Card Detected")
+                is_sensitive = True
+
+            elif any(keyword in text for keyword in PAN_KEYWORDS):
+                print(">> PAN Card Detected")
+                is_sensitive = True
+
+            else:
+                print(">> Normal Image")
+
+            if is_sensitive:
                 draw.rectangle(
-                    [(x_min, y_min), (x_max, y_max)],
+                    [(0, 0), img.size],
                     fill="black",
                 )
 
-        del cv_img
+            if is_sensitive or qr_detected:
+                img.save(path, optimize=True, quality=80)
 
-        text = pytesseract.image_to_string(img).lower()
+            img.close()
 
-        print(f"\n========== {file} ==========")
-        print(text)
+            del draw
+            del img
 
-        is_sensitive = False
+            gc.collect()
 
-        if (
-            re.search(AADHAAR_NUMBER, text)
-            and ("male" in text or "female" in text)
-        ):
-            print(">> Aadhaar Card Detected")
-            is_sensitive = True
-
-        elif any(keyword in text for keyword in PAN_KEYWORDS):
-            print(">> PAN Card Detected")
-            is_sensitive = True
-
-        else:
-            print(">> Normal Image")
-
-        if is_sensitive:
-            draw.rectangle([(0, 0), img.size], fill="black")
-
-        if is_sensitive or qr_detected:
-            img.save(path)
-
-        img.close()
-
-        del img
-        del draw
-        gc.collect()
+        except Exception as e:
+            print(f"Error processing {file}: {e}")
+            continue
