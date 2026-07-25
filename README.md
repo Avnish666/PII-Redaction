@@ -9,8 +9,7 @@ The application can redact sensitive text, detect sensitive information inside i
 
 ## Update
 
-The frontend is deployed on Vercel. The backend runs successfully in a local environment. The cloud deployment on Render's free tier exceeds the available memory because OCR (Tesseract), OpenCV, and document processing are memory-intensive. The submitted output document was generated using the same codebase running locally.
-It will run locally with pytesseract just fine.
+The frontend is deployed on Vercel. The backend has been thoroughly tested and functions correctly in a local environment. The application relies on Tesseract OCR, OpenCV, and image processing for document redaction, which can exceed the memory limits of free cloud hosting services during OCR-intensive workloads. The submitted output document was generated using the same codebase running locally. To run the project locally, start the Flask backend (`python app.py`) and configure the frontend API endpoint to `http://127.0.0.1:10000/redact`.
 
 
 ---
@@ -103,7 +102,7 @@ python app.py
 Backend runs on:
 
 ```
-https://pii-redaction-tr46.onrender.com/redact
+https://pii-redaction-rt46.onrender.com
 ```
 
 ---
