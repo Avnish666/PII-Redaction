@@ -1,8 +1,0 @@
-__pycache__/
-images/
-uploads/
-output/
-.git/
-.gitignore
-README.md
-*.pyc
