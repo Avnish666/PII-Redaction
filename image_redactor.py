@@ -24,8 +24,12 @@ PAN_KEYWORDS = [
 ]
 
 
+import gc
+
 def redact_images():
     folder = "images"
+
+    detector = cv2.QRCodeDetector()
 
     for file in os.listdir(folder):
 
@@ -38,14 +42,22 @@ def redact_images():
             continue
 
         img = Image.open(path).convert("RGB")
-        draw = ImageDraw.Draw(img)
 
+        # Resize huge images before OCR
+        MAX_WIDTH = 1200
+
+        if img.width > MAX_WIDTH:
+            ratio = MAX_WIDTH / img.width
+            img = img.resize(
+                (MAX_WIDTH, int(img.height * ratio)),
+                Image.Resampling.LANCZOS,
+            )
+
+        draw = ImageDraw.Draw(img)
 
         qr_detected = False
 
         cv_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
-
-        detector = cv2.QRCodeDetector()
 
         success, decoded_info, points, _ = detector.detectAndDecodeMulti(cv_img)
 
@@ -66,6 +78,8 @@ def redact_images():
                     [(x_min, y_min), (x_max, y_max)],
                     fill="black",
                 )
+
+        del cv_img
 
         text = pytesseract.image_to_string(img).lower()
 
@@ -88,9 +102,14 @@ def redact_images():
         else:
             print(">> Normal Image")
 
-
         if is_sensitive:
             draw.rectangle([(0, 0), img.size], fill="black")
 
         if is_sensitive or qr_detected:
             img.save(path)
+
+        img.close()
+
+        del img
+        del draw
+        gc.collect()
