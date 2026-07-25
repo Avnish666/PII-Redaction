@@ -10,7 +10,7 @@ The application can redact sensitive text, detect sensitive information inside i
 ## Update
 
 The frontend is deployed on Vercel. The backend runs successfully in a local environment. The cloud deployment on Render's free tier exceeds the available memory because OCR (Tesseract), OpenCV, and document processing are memory-intensive. The submitted output document was generated using the same codebase running locally.
-
+It will run locally with pytesseract just fine.
 ---
 
 ## 📸 Application Preview
